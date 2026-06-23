@@ -95,6 +95,26 @@
             "src/Web/Pages/**",
             "src/Web/wwwroot/**"
           ]
+        },
+        {
+          "condition": "(!useMediatr)",
+          "exclude": [
+            "src/Application/Behaviors/**",
+            "src/Application/Features/**",
+            "src/Application/Extensions/**"
+          ]
+        },
+        {
+          "condition": "(!useApiVersioning)",
+          "exclude": [
+            "src/Web/Setup/ConfigureSwaggerOptions.cs"
+          ]
+        },
+        {
+          "condition": "(!useJwt)",
+          "exclude": [
+            "src/Infrastructure/Options/JwtOptions.cs"
+          ]
         }
       ]
     }

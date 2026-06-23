@@ -1,6 +1,6 @@
 using Serilog.Sinks.SystemConsole.Themes;
 
-namespace Web.Logging;
+namespace Web.Setup;
 
 public static class SerilogTheme
 {

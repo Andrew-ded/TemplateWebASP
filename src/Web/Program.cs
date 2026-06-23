@@ -1,22 +1,36 @@
+//#if (useJwt)
 using System.Text;
+//#endif
+//#if (useRateLimiting)
 using System.Threading.RateLimiting;
+//#endif
+//#if (useMediatr)
 using Application.Extensions;
+//#endif
 using Infrastructure.Extensions;
+//#if (useJwt)
 using Infrastructure.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+//#endif
+//#if (useApiVersioning)
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+//#endif
+//#if (useRateLimiting)
 using Microsoft.AspNetCore.RateLimiting;
+//#endif
+//#if (useJwt)
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+//#endif
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
+//#if (useApiVersioning)
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Web.Doc;
-using Web.Errors;
-using Web.Logging;
+//#endif
 using Web.Middleware;
+using Web.Setup;
 
 // ======================== Serilog ========================
 var date = DateTime.Now.ToString("yyyy-MM-dd");
@@ -47,18 +61,23 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
+//#if (useJwt)
 // ======================== Options ========================
 builder.Services
     .AddOptions<JwtOptions>()
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+//#endif
 
 // ======================== Infrastructure & Application ========================
 var useTestDb = builder.Environment.IsDevelopment();
 builder.Services.AddInfrastructure(builder.Configuration, useTestDb);
+//#if (useMediatr)
 builder.Services.AddApplication();
+//#endif
 
+//#if (useJwt)
 // ======================== JWT Authentication ========================
 var jwtOptions = builder.Configuration
     .GetSection(JwtOptions.SectionName)
@@ -110,17 +129,22 @@ builder.Services.AddAuthorizationBuilder()
     {
         policy.RequireAuthenticatedUser();
     });
+//#endif
 
-// ======================== Razor Pages + Controllers ========================
+//#if (useRazorPages)
+// ======================== Razor Pages ========================
 builder.Services.AddRazorPages();
-
-builder.Services.AddControllers();
 
 builder.Services.AddAntiforgery(options =>
 {
     options.HeaderName = "X-CSRF-TOKEN";
 });
+//#endif
 
+// ======================== Controllers ========================
+builder.Services.AddControllers();
+
+//#if (useApiVersioning)
 // ======================== API Versioning ========================
 builder.Services.AddApiVersioning(options =>
 {
@@ -134,12 +158,16 @@ builder.Services.AddVersionedApiExplorer(options =>
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
 });
+//#endif
 
 // ======================== Swagger / OpenAPI ========================
 builder.Services.AddEndpointsApiExplorer();
+//#if (useApiVersioning)
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+//#endif
 builder.Services.AddSwaggerGen();
 
+//#if (useRateLimiting)
 // ======================== Rate Limiting ========================
 builder.Services.AddRateLimiter(options =>
 {
@@ -161,22 +189,24 @@ builder.Services.AddRateLimiter(options =>
                 QueueLimit = 0
             }));
 });
+//#endif
 
 builder.Services.AddProblemDetails();
 
 // ======================== App Build ========================
 var app = builder.Build();
 
-// app.UsePathBase("/AppName");
-
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
 
+//#if (useApiVersioning)
 var apiVersionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+//#endif
 
 app.UseSwagger();
+//#if (useApiVersioning)
 app.UseSwaggerUI(options =>
 {
     foreach (var desc in apiVersionProvider.ApiVersionDescriptions)
@@ -186,6 +216,9 @@ app.UseSwaggerUI(options =>
             desc.GroupName.ToUpperInvariant());
     }
 });
+//#else
+app.UseSwaggerUI();
+//#endif
 app.MapScalarApiReference(options =>
 {
     options.WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json");
@@ -194,12 +227,18 @@ app.MapScalarApiReference(options =>
 app.UseStaticFiles();
 app.UseRouting();
 app.UseMiddleware<RequestLoggingMiddleware>();
+//#if (useRateLimiting)
 app.UseRateLimiter();
+//#endif
+//#if (useJwt)
 app.UseAuthentication();
 app.UseAuthorization();
+//#endif
 
 app.MapControllers();
+//#if (useRazorPages)
 app.MapRazorPages();
+//#endif
 
 try
 {

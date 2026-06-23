@@ -1,4 +1,4 @@
-namespace Web.Errors;
+namespace Web.Setup;
 
 public class ApiErrorResponse
 {
