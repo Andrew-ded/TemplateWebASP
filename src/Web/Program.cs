@@ -169,18 +169,28 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseSwagger();
+var apiVersionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+app.UseSwagger(options =>
+{
+    options.RouteTemplate = "openapi/{documentName}.json";
+});
 app.UseSwaggerUI(options =>
 {
-    var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-    foreach (var desc in provider.ApiVersionDescriptions)
+    foreach (var desc in apiVersionProvider.ApiVersionDescriptions)
     {
         options.SwaggerEndpoint(
-            $"/swagger/{desc.GroupName}/swagger.json",
+            $"/openapi/{desc.GroupName}.json",
             desc.GroupName.ToUpperInvariant());
     }
 });
-app.MapScalarApiReference();
+app.MapScalarApiReference(options =>
+{
+    foreach (var desc in apiVersionProvider.ApiVersionDescriptions)
+    {
+        options.AddDocument(desc.GroupName, $"/openapi/{desc.GroupName}.json");
+    }
+});
 
 app.UseStaticFiles();
 app.UseRouting();
