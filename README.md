@@ -22,6 +22,8 @@ src/
 - **IOptions<T>** — с `ValidateDataAnnotations()` + `ValidateOnStart()`
 
 ## Дополнительно
+- **MediatR + CQRS** — Commands/Queries через Mediator, Pipeline Behaviors (валидация, логирование)
+- **FluentValidation** — валидация запросов через Pipeline Behavior
 - **JWT аутентификация** — настроенный JwtBearer с кастомными ответами на 401/403
 - **API Versioning** — версионирование через URL (`/api/v1/...`)
 - **Rate Limiting** — FixedWindow политики для защиты API

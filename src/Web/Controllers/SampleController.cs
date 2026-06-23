@@ -1,5 +1,6 @@
-using Domain.Entities;
-using Domain.Interfaces;
+using Application.Features.Sample.Commands;
+using Application.Features.Sample.Queries;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Web.Errors;
@@ -11,19 +12,19 @@ namespace Web.Controllers;
 [Route("api/v{version:apiVersion}/[controller]")]
 [Route("api/[controller]")]
 [Authorize]
-public class SampleController(IRepository<SampleEntity> repository) : ControllerBase
+public class SampleController(IMediator mediator) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
     {
-        var items = await repository.GetAllAsync(cancellationToken);
+        var items = await mediator.Send(new GetAllSamplesQuery(), cancellationToken);
         return Ok(items);
     }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
     {
-        var item = await repository.GetByIdAsync(id, cancellationToken);
+        var item = await mediator.Send(new GetSampleByIdQuery(id), cancellationToken);
         if (item is null)
             return NotFound(ApiErrors.NotFound($"Sample with id {id} not found"));
 
@@ -31,24 +32,16 @@ public class SampleController(IRepository<SampleEntity> repository) : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateSampleRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Create([FromBody] CreateSampleCommand command, CancellationToken cancellationToken)
     {
-        var entity = new SampleEntity
-        {
-            Name = request.Name,
-            Description = request.Description
-        };
-
-        await repository.AddAsync(entity, cancellationToken);
+        var entity = await mediator.Send(command, cancellationToken);
         return CreatedAtAction(nameof(GetById), new { id = entity.Id }, entity);
     }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
-        await repository.DeleteAsync(id, cancellationToken);
+        await mediator.Send(new DeleteSampleCommand(id), cancellationToken);
         return NoContent();
     }
 }
-
-public record CreateSampleRequest(string Name, string? Description);
