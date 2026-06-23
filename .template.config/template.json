@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Andrew-ded",
+  "classifications": ["Web", "ASP.NET", "API", "Clean Architecture"],
+  "identity": "TemplateWebASP",
+  "name": "ASP.NET Clean Architecture Template",
+  "shortName": "aspclean",
+  "tags": {
+    "language": "C#",
+    "type": "solution"
+  },
+  "sourceName": "TemplateWebASP",
+  "preferNameDirectory": true,
+  "symbols": {
+    "useMediatr": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "displayName": "Include MediatR (CQRS)",
+      "description": "Include MediatR with CQRS pattern, Pipeline Behaviors and FluentValidation"
+    },
+    "useJwt": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "displayName": "Include JWT Authentication",
+      "description": "Include JWT Bearer authentication with custom error responses"
+    },
+    "useRateLimiting": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "displayName": "Include Rate Limiting",
+      "description": "Include ASP.NET Core Rate Limiting with FixedWindow policy"
+    },
+    "useApiVersioning": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "displayName": "Include API Versioning",
+      "description": "Include API Versioning via URL (/api/v1/...)"
+    },
+    "useRazorPages": {
+      "type": "parameter",
+      "datatype": "bool",
+      "defaultValue": "true",
+      "displayName": "Include Razor Pages",
+      "description": "Include Razor Pages with Layout and Antiforgery"
+    },
+    "dbProvider": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "sqlserver",
+      "displayName": "Database Provider",
+      "description": "Choose database provider for Entity Framework Core",
+      "choices": [
+        {
+          "choice": "sqlserver",
+          "displayName": "SQL Server",
+          "description": "Microsoft SQL Server"
+        },
+        {
+          "choice": "inmemory",
+          "displayName": "InMemory (Dev only)",
+          "description": "InMemory database for development"
+        }
+      ]
+    }
+  },
+  "sources": [
+    {
+      "modifiers": [
+        {
+          "condition": "(!useRazorPages)",
+          "exclude": [
+            "src/Web/Pages/**",
+            "src/Web/wwwroot/**"
+          ]
+        }
+      ]
+    }
+  ]
+}
