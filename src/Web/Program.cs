@@ -12,33 +12,38 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
+using Serilog.Sinks.SystemConsole.Themes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Web.Doc;
 using Web.Errors;
 using Web.Logging;
+using Web.Middleware;
 
 // ======================== Serilog ========================
 var date = DateTime.Now.ToString("yyyy-MM-dd");
 var time = DateTime.Now.ToString("HH-mm-ss");
 var logPath = Path.Combine("Logs", date, time);
+var isDev = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
+    .MinimumLevel.Is(isDev ? LogEventLevel.Debug : LogEventLevel.Information)
     .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
     .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
+    .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
     .Enrich.FromLogContext()
     .WriteTo.Console(
-        outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message}{NewLine}{Exception}")
+        outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+        theme: AnsiConsoleTheme.Code)
     .WriteTo.Logger(lc => lc
         .Filter.With(SourceContextFilter.Exclude("Api"))
         .WriteTo.File(
             path: Path.Combine(logPath, "app.log"),
-            outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] ({SourceContext}) {Message}{NewLine}{Exception}"))
+            outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] ({SourceContext}) {Message:lj}{NewLine}{Exception}"))
     .WriteTo.Logger(lc => lc
         .Filter.With(SourceContextFilter.Include("Api"))
         .WriteTo.File(
             path: Path.Combine(logPath, "api.log"),
-            outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] [{StatusCode}] ({SourceContext}) {Message}{NewLine}{Exception}"))
+            outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] [{StatusCode}] ({SourceContext}) {Message:lj}{NewLine}{Exception}"))
     .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -51,7 +56,8 @@ builder.Services
     .ValidateOnStart();
 
 // ======================== Infrastructure & Application ========================
-builder.Services.AddInfrastructure(builder.Configuration);
+var useTestDb = builder.Environment.IsDevelopment();
+builder.Services.AddInfrastructure(builder.Configuration, useTestDb);
 builder.Services.AddApplication();
 
 // ======================== JWT Authentication ========================
@@ -188,6 +194,7 @@ app.MapScalarApiReference(options =>
 
 app.UseStaticFiles();
 app.UseRouting();
+app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseRateLimiter();
 app.UseAuthentication();
 app.UseAuthorization();
