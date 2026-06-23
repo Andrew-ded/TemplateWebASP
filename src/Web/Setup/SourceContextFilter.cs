@@ -1,7 +1,7 @@
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Web.Logging;
+namespace Web.Setup;
 
 public class SourceContextFilter(string match, bool include) : ILogEventFilter
 {
