@@ -184,13 +184,7 @@ app.UseSwaggerUI(options =>
             desc.GroupName.ToUpperInvariant());
     }
 });
-app.MapScalarApiReference(options =>
-{
-    foreach (var desc in apiVersionProvider.ApiVersionDescriptions)
-    {
-        options.AddDocument(desc.GroupName, $"/openapi/{desc.GroupName}.json");
-    }
-});
+app.MapScalarApiReference();
 
 app.UseStaticFiles();
 app.UseRouting();
