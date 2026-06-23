@@ -24,6 +24,7 @@ src/
 ## Дополнительно
 - **MediatR + CQRS** — Commands/Queries через Mediator, Pipeline Behaviors (валидация, логирование)
 - **FluentValidation** — валидация запросов через Pipeline Behavior
+- **Serilog** — Console + File sinks, разделение логов: `app.log` (приложение) и `api.log` (API с StatusCode), папка `Logs/{date}/{time}/`
 - **JWT аутентификация** — настроенный JwtBearer с кастомными ответами на 401/403
 - **API Versioning** — версионирование через URL (`/api/v1/...`)
 - **Rate Limiting** — FixedWindow политики для защиты API
