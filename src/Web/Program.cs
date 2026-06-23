@@ -171,20 +171,20 @@ if (app.Environment.IsDevelopment())
 
 var apiVersionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
-app.UseSwagger(options =>
-{
-    options.RouteTemplate = "openapi/{documentName}.json";
-});
+app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
     foreach (var desc in apiVersionProvider.ApiVersionDescriptions)
     {
         options.SwaggerEndpoint(
-            $"/openapi/{desc.GroupName}.json",
+            $"/swagger/{desc.GroupName}/swagger.json",
             desc.GroupName.ToUpperInvariant());
     }
 });
-app.MapScalarApiReference();
+app.MapScalarApiReference(options =>
+{
+    options.WithOpenApiRoutePattern("/swagger/{documentName}/swagger.json");
+});
 
 app.UseStaticFiles();
 app.UseRouting();
