@@ -107,10 +107,7 @@ builder.Services.AddAuthorizationBuilder()
     });
 
 // ======================== Razor Pages + Controllers ========================
-builder.Services.AddRazorPages(options =>
-{
-    options.Conventions.AddPageRoute("/Index", "/");
-});
+builder.Services.AddRazorPages();
 
 builder.Services.AddControllers();
 
