@@ -59,4 +59,3 @@ nunit-*.xml
 # Serilog Logs
 Logs/
 /.vs
-/src/Web
