@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddOptions<DatabaseOptions>()
             .Bind(configuration.GetSection(DatabaseOptions.SectionName))
-            .ValidateDataAnnotations()
+            //.ValidateDataAnnotations()
             .ValidateOnStart();
 
         var dbOptions = configuration
