@@ -56,7 +56,8 @@ builder.Services
     .ValidateOnStart();
 
 // ======================== Infrastructure & Application ========================
-builder.Services.AddInfrastructure(builder.Configuration);
+var useTestDb = builder.Environment.IsDevelopment();
+builder.Services.AddInfrastructure(builder.Configuration, useTestDb);
 builder.Services.AddApplication();
 
 // ======================== JWT Authentication ========================

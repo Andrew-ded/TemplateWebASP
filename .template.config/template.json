@@ -52,7 +52,7 @@
       "datatype": "choice",
       "defaultValue": "sqlserver",
       "displayName": "Database Provider",
-      "description": "Choose database provider for Entity Framework Core",
+      "description": "Main database provider for Entity Framework Core",
       "choices": [
         {
           "choice": "sqlserver",
@@ -60,9 +60,28 @@
           "description": "Microsoft SQL Server"
         },
         {
+          "choice": "mysql",
+          "displayName": "MySQL / MariaDB",
+          "description": "MySQL or MariaDB (via Pomelo)"
+        }
+      ]
+    },
+    "testDbProvider": {
+      "type": "parameter",
+      "datatype": "choice",
+      "defaultValue": "inmemory",
+      "displayName": "Test Database Provider",
+      "description": "Database provider for development/testing",
+      "choices": [
+        {
           "choice": "inmemory",
-          "displayName": "InMemory (Dev only)",
-          "description": "InMemory database for development"
+          "displayName": "InMemory",
+          "description": "EF Core InMemory database (fast, no file)"
+        },
+        {
+          "choice": "sqlite",
+          "displayName": "SQLite",
+          "description": "SQLite in-memory (supports relational features, migrations)"
         }
       ]
     }
