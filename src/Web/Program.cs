@@ -12,7 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
-using Serilog.Sinks.SystemConsole.Themes;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Web.Doc;
 using Web.Errors;
@@ -33,7 +32,7 @@ Log.Logger = new LoggerConfiguration()
     .Enrich.FromLogContext()
     .WriteTo.Console(
         outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
-        theme: AnsiConsoleTheme.Code)
+        theme: SerilogTheme.Colored)
     .WriteTo.Logger(lc => lc
         .Filter.With(SourceContextFilter.Exclude("Api"))
         .WriteTo.File(

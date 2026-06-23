@@ -8,7 +8,7 @@ namespace Web.Middleware;
 
 public class RequestLoggingMiddleware(RequestDelegate next)
 {
-    private static readonly ILogger _log = Log.ForContext<RequestLoggingMiddleware>();
+    private static readonly ILogger _log = Log.ForContext("SourceContext", "Api.Requests");
 
     public async Task InvokeAsync(HttpContext context)
     {
