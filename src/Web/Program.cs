@@ -26,6 +26,7 @@ using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using Serilog;
 using Serilog.Events;
+using Serilog.Formatting.Compact;
 //#if (useApiVersioning)
 using Swashbuckle.AspNetCore.SwaggerGen;
 //#endif
@@ -47,6 +48,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(
         outputTemplate: "{Timestamp:HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
         theme: SerilogTheme.Colored)
+    .WriteTo.File(
+        formatter: new CompactJsonFormatter(),
+        path: Path.Combine(logPath, "all.clef"))
     .WriteTo.Logger(lc => lc
         .Filter.With(SourceContextFilter.Exclude("Api"))
         .WriteTo.File(
